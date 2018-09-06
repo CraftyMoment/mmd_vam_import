@@ -12,9 +12,10 @@ You can download it from [here](https://learnmmd.com/http:/learnmmd.com/download
         1. Install python (https://realpython.com/installing-python/) if you haven't. This uses Python 3.
         2. Install pip if you don't have it. Should come with Python 3.
         3. Open a command line, run "pip install pyquaternion"
+        4. Download vmd.py and base.json
 
     After setup:
-        1. Open vmd.py in any text editor
+        1. Open vmd.py in any text editor, don't be afraid.
         2. Set the MMD_MOTION_FILE variable to the location of the .vmd file.
         3. Set the VAM_SCENE_BASE variable to the location where the base.json file is saved.
         4. Save the file.
