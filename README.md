@@ -21,7 +21,7 @@ You can download it from [here](https://learnmmd.com/http:/learnmmd.com/download
         4. Save the file.
         5. Open a command line. Run python [DIR]\vmd.py, where DIR is where you put the vmd.py file.
         6. The resulting scene file will be VAM_OUT_SCENE.
-        5. Tweak! Tweaking the physics of the model is probably the most important part to get decent results.
+        7. Tweak! Tweaking the physics of the model is probably the most important part to get decent results.
         See below for how to get better results.
 
 Note: You *have* to use the base scene first. After your motion is done you can change the output scene any way you want.
