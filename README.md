@@ -78,15 +78,15 @@ Timestep is just the frame number / 30 since MMD is 30 FPS.
 
 So we extract from MMD, use the mapping to match each bone and then put in VaM. That's the whole idea. Pretty simple right? So why wasn't this done a while back?
 
+Well, here's the tricky part: MMD uses relative rotations. VAM uses absolute rotations. Let me explain.
+
 A couple of basic concepts first:
   * Motion is a sequence of body poses. And while you may think of a body pose as a set of xyz positions of body parts, you can also express a pose as a set of rotations. E.g. crossing your arms is first rotating your shoulders by ~90 deg towards your chest and then rotating your elbows upwards by 90 deg. In fact, this way of describing poses is much more flexible as the size of the arms doesn't matter (it does if you use positions). So MMD cares only about rotations for all bones and only cares about position for "center" and the two feet. Why? I'm not sure, but that's how it works.
   * Back to crossing your arms, notice that when you rotate your shoulder towards your chest your elbow also rotates in the same direction and by the same amount, and so does your hand as if they "depended" on the rotation of your shoulder. When you bend your elbow your hand also rotates but not the shoulder.
 So there's a "rotation dependency" between bones: The hand's rotation depends on the elbow's rotation and the elbow's rotation in turn depends on the shoulder's rotation.
 
-Well, here's the tricky part: MMD uses relative rotations. VAM uses absolute rotations.
-
-So in the crossing arms example MMD would say you rotated your shoulder 90 deg sideways and then your elbow rotated 90 deg upwards *relative* to the current shoulder rotation. Your hand is rotated 0 relative to your elbow.
-But VAM would say you rotated your shoulder by 90deg sideways *and so did your elbow and hand because everything rotates when you turn your shoulder* and your elbow AND hand 90 deg upwards.
+MMD tracks rotations relative to the previous bone. VAM tracks rotations relative to the main axis. So, in the crossing arms example MMD would say you rotated your shoulder 90 deg sideways and then your elbow rotated 90 deg upwards *relative* to the current shoulder rotation. Your hand is rotated 0 relative to your elbow.
+But VAM would say you rotated your shoulder by 90deg sideways *and so did your elbow and hand* because remember, everything in your arm rotates when you turn your shoulder. Also, your elbow AND hand both rotated 90 deg upwards.
 
 So MMD says (x,y,z):
 
@@ -118,7 +118,7 @@ In other words, to convert from relative to absolute coordinates you need to com
 
 Ok, so recapping. First we extract from the MMD file all the information for each position/rotation for each frame for each bone, translate the names in the process and map them to bones in VAM. Then we iterate over this map and calculate the positions for the chest, then the shoulders (by adding the chest), then the elbows (by adding the shoulders), etc. We store it all and then convert it to VAM's json format. That's it! But, there's a catch.
 
-Turns out "combining" or "adding" rotations in 3 dimensions (aka. Euler angles) by elementary addition doesn't quite work. That is, the combination or sum of two vectors in 3 dimensions (10º,5º,3º) and (2º,5º,3º) is not (12º,10º,6º). In fact the math two combine two rotation vectors in 3 dimensions is pretty ugly, so to combine two rotations you need to use Quaternions.
+Turns out "combining" or "adding" rotations in 3 dimensions (aka. Euler angles) by elementary addition doesn't quite work. That is, the combination or sum of two vectors in 3 dimensions (10º,5º,3º) and (2º,5º,3º) is not (12º,10º,6º). In fact the math two combine two rotation vectors in 3 dimensions is pretty ugly, so to combine two rotations you need to use Quaternions. You multiply quaternions in reverse to add them.
 
 \- Quat-what???
 
