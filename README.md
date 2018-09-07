@@ -9,19 +9,23 @@ You can download it from [here](https://learnmmd.com/http:/learnmmd.com/download
 
 # Instructions
     One time setup:
-        1. Install python (https://realpython.com/installing-python/) if you haven't. This uses Python 3.
+        1. Install python (https://realpython.com/installing-python/) if don't have it. This uses Python 3.
         2. Install pip if you don't have it. Should come with Python 3.
         3. Open a command line, run "pip install pyquaternion"
         4. Download vmd.py and base.json
 
     After setup:
         1. Open vmd.py in any text editor, don't be afraid.
-        2. Set the MMD_MOTION_FILE variable to the location of the .vmd file.
+        2. Set the MMD_MOTION_FILE variable to the location of the .vmd file. *Use double backslash*
+           (e.g. "C:\\Users\\myuser\\Desktop\\mymotion.vmd")
         3. Set the VAM_SCENE_BASE variable to the location where the base.json file is saved.
-        4. Save the file.
-        5. Open a command line. Run python [DIR]\vmd.py, where DIR is where you put the vmd.py file.
-        6. The resulting scene file will be VAM_OUT_SCENE.
-        7. Tweak! Tweaking the physics of the model is probably the most important part to get decent results.
+           (e.g. "C:\\Users\\myuser\\Desktop\\base.json")
+        4. Set the VAM_OUT_SCENE variable to the location where the output will be.
+           (e.g. "C:\\Users\\myuser\\Desktop\\out.json")
+        5. Save the file and exit.
+        6. Open a command line. Run python [DIR]\vmd.py, where DIR is where you put the vmd.py file.
+        7. The resulting scene file will be in VAM_OUT_SCENE.
+        8. Tweak! Tweaking the physics of the model is probably the most important part to get decent results.
         See below for how to get better results.
 
 Note: You *have* to use the base scene first. After your motion is done you can change the output scene any way you want.
