@@ -57,17 +57,11 @@ Note: You *have* to use the base scene first. After your motion is done you can 
 # How does this work?
 This section explains in detail how this code works. If you don't care about the inner workings of it, don't bother reading this section. Also, if you have experience in 3D graphics some of this is gonna be pretty elementary to you. I was completely new to it so I will assume the same of most readers.
 
-A couple of basic concepts first:
-  * Motion is a sequence of body poses. And while you may think of a body pose as a set of xyz positions of body parts, you can also express a pose as a set of rotations. E.g. crossing your arms is first rotating your shoulders by ~90 deg towards your chest and then rotating your elbows upwards by 90 deg. In fact, this way of describing poses is much more flexible as the size of the arms doesn't matter (it does in absolute positions). This is how MMD stores pose data per frame except for 3 bones: The "center" and the two feet. Why? I'm not sure, but that's how it works. So it likes rotations for every bone and positions for feet and center.
-  * Back to crossing your arms, notice that when you rotate your shoulder towards your chest your elbow also rotates in the same direction and by the same amount, and so does your hand as if they "depended" on the rotation of your shoulder. When you bend your elbow your hand also rotates but not the shoulder.
-So there's a "rotation dependency" between bones: The hand's rotation depends on the elbow's rotation and the elbow's rotation in turn depends on the shoulder's rotation.
+It goes like this: MMD motion files store rotation and position information for each joint (aka bone) for each frame. Each chunk of data in the file contains a bone name (in japanese, so it's translated), a frame number, a position XYZ, a rotation XYZW (more on the W later) and interpolation data (not currently used). We open the file to extract the data and put in a map for processing.
 
+In order to do the conversion we map the bone names of MMD to the bone names in VMD. The mappings are defined in MMD_TO_VAM_BONE_MAPPINGS. Some bones are perfect matches (LeftShoulder -> lShoulder), but some are approximations (e.g. LowerBody -> pelvis).
 
-The first step is to read and extracting the bone name and rotation at each frame of the VMD file. Each chunk of data in the file contains a bone name (in japanese, so it's translated), a frame number, a position XYZ, a rotation XYZW (more on the W later) and interpolation data (not currently used). The extracted data is put in a map for processing.
-
-In order to do the conversion we map the bone names in MMD to the bone names in VMD. The mappings are defined in MMD_TO_VAM_BONE_MAPPINGS. Some bones are perfect matches (LeftShoulder -> lShoulder), but some are approximations (e.g. LowerBody -> pelvis).
-
-Using the bone name mappings, we assign the positions / rotations we got from step (1). But remember, only feet and center use positions, everything else uses rotations. So we turn off position for all bones except those 3. We then put them in the VAM scene file using VAMs animation format which is just some json that looks like this:
+Using the bone name mappings, we assign the positions / rotations we got from step (1) and we put them in the VAM scene file using VAMs animation format which is just some json that is very similar in what it expects, a bone name, a position and a rotation.The format VAM expects looks like this:
 
     {
       id : [boneName]Animation:
@@ -82,7 +76,13 @@ Using the bone name mappings, we assign the positions / rotations we got from st
 
 Timestep is just the frame number / 30 since MMD is 30 FPS.
 
-That's the whole idea. Pretty simple right? So why wasn't this done a while back?
+So we extract from MMD, use the mapping to match each bone and then put in VaM. That's the whole idea. Pretty simple right? So why wasn't this done a while back?
+
+A couple of basic concepts first:
+  * Motion is a sequence of body poses. And while you may think of a body pose as a set of xyz positions of body parts, you can also express a pose as a set of rotations. E.g. crossing your arms is first rotating your shoulders by ~90 deg towards your chest and then rotating your elbows upwards by 90 deg. In fact, this way of describing poses is much more flexible as the size of the arms doesn't matter (it does if you use positions). So MMD cares only about rotations for all bones and only cares about position for "center" and the two feet. Why? I'm not sure, but that's how it works.
+  * Back to crossing your arms, notice that when you rotate your shoulder towards your chest your elbow also rotates in the same direction and by the same amount, and so does your hand as if they "depended" on the rotation of your shoulder. When you bend your elbow your hand also rotates but not the shoulder.
+So there's a "rotation dependency" between bones: The hand's rotation depends on the elbow's rotation and the elbow's rotation in turn depends on the shoulder's rotation.
+
 Well, here's the tricky part: MMD uses relative rotations. VAM uses absolute rotations.
 
 So in the crossing arms example MMD would say you rotated your shoulder 90 deg sideways and then your elbow rotated 90 deg upwards *relative* to the current shoulder rotation. Your hand is rotated 0 relative to your elbow.
