@@ -59,7 +59,7 @@ This section explains in detail how this code works. If you don't care about the
 
 It goes like this: MMD motion files store rotation and position information for each joint (aka bone) for each frame. Each chunk of data in the file contains a bone name (in japanese, so it's translated), a frame number, a position XYZ, a rotation XYZW (more on the W later) and interpolation data (not currently used). We open the file to extract the data and put in a map for processing.
 
-In order to do the conversion we map the bone names of MMD to the bone names in VMD. The mappings are defined in MMD_TO_VAM_BONE_MAPPINGS. Some bones are perfect matches (LeftShoulder -> lShoulder), but some are approximations (e.g. LowerBody -> pelvis).
+In order to do the conversion we map the bone names of MMD to the bone names in VAM. The mappings are defined in MMD_TO_VAM_BONE_MAPPINGS. Some bones are perfect matches (LeftShoulder -> lShoulder), but some are approximations (e.g. LowerBody -> pelvis).
 
 Using the bone name mappings, we assign the positions / rotations we got from step (1) and we put them in the VAM scene file using VAMs animation format which is just some json that is very similar in what it expects, a bone name, a position and a rotation.The format VAM expects looks like this:
 
@@ -114,7 +114,7 @@ VAM for elbow is:
     Y: 90(current) + 0 (dependecy)
     Z: 0(current) + 0 (dependecy)
 
-In other words, to convert from relative to absolute coordinates you need to combine the current rotation of the bone and the previous bone dependency.
+In other words, to convert from relative to absolute coordinates you need to combine the current rotation of the bone and the previous bone dependency. That's the key and that should let us do the conversion work!
 
 Ok, so recapping. First we extract from the MMD file all the information for each position/rotation for each frame for each bone, translate the names in the process and map them to bones in VAM. Then we iterate over this map and calculate the positions for the chest, then the shoulders (by adding the chest), then the elbows (by adding the shoulders), etc. We store it all and then convert it to VAM's json format. That's it! But, there's a catch.
 
